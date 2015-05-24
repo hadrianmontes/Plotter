@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 """
 @author: Hadrian Montes
+The MIT License (MIT)
 
+Copyright (c) 2015 Hadrián Montes
 """
 from Tkinter import *
 import ttk
