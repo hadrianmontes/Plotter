@@ -244,42 +244,53 @@ class plotter(Frame):
                 f.write("ylabel "+self.ylabel_index[i][j]+"\n")
                 #Now we loop in the files we have plotted 
                 for k in range(len(self.file_index[i][j])):
+                    #We frite file 1,2,3... before each configuration of a data ser, this number doesn't have any use at all, but maybe
+                    #in the future will, and it helps to struturize the logfile
                     f.write('file ')
                     f.write(str(k+1))
                     f.write('\n')
+                    #Wtite a line with the marker, the program is case sensitive
                     f.write('Marker '+self.marker_index[i][j][k]+'\n')
+                    #Another with the linestyle
                     f.write('Linestyle '+self.linestyle_index[i][j][k]+'\n')
+                    #The label of the file
                     f.write('Label '+self.label_index[i][j][k]+'\n')
+                    #The path to the file
                     f.write('Data '+self.file_index[i][j][k]+'\n')
                     
-    def read_logfile(self,*args):
-        filename=(tkFileDialog.askopenfilename())
-        self.load_logfile(filename)
-    def load_logfile(self,filename):
-        f=open(filename,'r')
-        for l in f:
-            if l.startswith("Total Row"):
-                total_rows=int(l.split()[2])
-                total_columns=int(l.split()[5])
+    def read_logfile(self,*args):#This function will get the path to the logfile we want to import 
+        filename=(tkFileDialog.askopenfilename())#This will open a window to select the path
+        self.load_logfile(filename)#We call the function that will actually load the logfile
+    def load_logfile(self,filename):#This function will load the logfile
+    #This function takes more arguments than the ones of the class. This was done in order to simplify 
+    #The load of the logfile directly from terminal
+        f=open(filename,'r')#Open the logfile 
+        for l in f:#Loop throw the lines looking for some key words that will load the configuration
+            #All the words are case sensitive, so if you want to make yourself the logfile you must notice that
+            if l.startswith("Total Row"):#This should be the first config line of the logfile
+                total_rows=int(l.split()[2])#Read the total number of rows
+                total_columns=int(l.split()[5])#And columns
                 if not (total_rows<=self.total_rows.get() & total_columns<=self.total_columns.get() & self.figure_created):
-                    self.total_rows.set(total_rows)
-                    self.total_columns.set(total_columns)
-                    self.create_subplots()
-            elif l.startswith("row"):
-                self.current_row.set(int(l.split()[1]))
+                #This will be executed if the subplots were not created or if the subplots created are not big enought.
+                #If the created subplots can fit the newones they will add to the current ones 
+                    self.total_rows.set(total_rows)#We set the total number of rows and columns
+                    self.total_columns.set(total_columns)#to the value of the logfile
+                    self.create_subplots()#Execute the function that create the subplots
+            elif l.startswith("row"):#This line is the one with the information of wich subplot are we editing
+                self.current_row.set(int(l.split()[1]))#We set the variables to that value
                 self.current_column.set(int(l.split()[3]))
-                self.change_subplot()
-            elif l.startswith("xlabel"):
+                self.change_subplot()#And change the subplot to that set
+            elif l.startswith("xlabel"):#This line is the one with the label o the x axis
                 xlabel=""
-                if len(l.split())>2:
+                if len(l.split())>2:#If the label is more than 1 word we add all the words within a separation of 1 space
                     for palabra in l.split()[1:-1]:
                         xlabel+=palabra+" "
-                    xlabel+=l.split()[-1]
-                elif len(l.split())==2:
-                    xlabel=l.split()[1]
+                    xlabel+=l.split()[-1]#And the las word whiout a separation
+                elif len(l.split())==2:#If it's only one word wen just 
+                    xlabel=l.split()[1]#set the correct value
                 self.x_label.set(xlabel)
-                self.update_labels()
-            elif l.startswith("ylabel"):
+                self.update_labels()#Run the function to make the change
+            elif l.startswith("ylabel"):#The same with the y axis
                 ylabel=""
                 if len(l.split())>2:
                     for palabra in l.split()[1:-1]:
@@ -289,35 +300,43 @@ class plotter(Frame):
                     ylabel=l.split()[1]
                 self.y_label.set(ylabel)
                 self.update_labels()
-            elif l.startswith("Marker"):
-                self.marker.set(l.split()[1])
-            elif l.startswith("Linestyle"):
-                self.linestyle.set(l.split()[1])
-            elif l.startswith("Label"):
+            elif l.startswith("Marker"):#This line have the marker 
+                self.marker.set(l.split()[1])#Set the marker to the correct value
+                #If this lien is not finded the value of this variable will be the last one used or, if it wasn't used before, the
+                #preset value, this aplies also to the linestyle
+            elif l.startswith("Linestyle"):#This line have the linestyle wanted
+                self.linestyle.set(l.split()[1])#set the variable to it's proper value
+            elif l.startswith("Label"):#This lane have the value of the label 
                 label=""
-                if len(l.split())>2:
+                if len(l.split())>2:#We make the same trick than for reading the x and y labels
                     for palabra in l.split()[1:-1]:
                         label=label+palabra+" "
                     label=label+l.split()[-1]
                 elif len(l.split())==2:
                     label=l.split()[1]
-                self.label.set(label)
-            elif l.startswith("Data"):
+                self.label.set(label)#Update the calue of the label variable
+            elif l.startswith("Data"):#This line have the path to the file with the data, it can be absolute or relative path
+                #In oreder to avoid errors is better to use absolute paths (the ones the program writes with the export logfile)
                 filename2=""
-                if len(l.split())>2:
+                if len(l.split())>2:#We make the same trick than with the labels
                     for palabra in l.split()[1:-1]:
                         filename2=filename2+palabra+" "
                     filename2=filename2+l.split()[-1]
                 elif len(l.split())==2:
                     filename2=l.split()[1]
-                self.filename.set(filename2)
-                self.make_plot()
-        f.close()
-root=Tk()
-root.title("Plotter")
-plotprog=plotter(root)
-if len(sys.argv)==3: #Anhadimos la posibilidad de hacer la grafica usando un logfile desde la terminal
-    plotprog.load_logfile(sys.argv[1])#Archivo de entrada sys.argv[1]
-    plotprog.fig.savefig(sys.argv[2])#archivo de salida sys.argv[2]
+                self.filename.set(filename2)#Update the variable with the path to the data file
+                self.make_plot()#We make the plot
+        f.close()#Finally we close the file
+
+#This is the beginnig of the main program
+root=Tk()#We create the root window, where everything will run
+root.title("Plotter")#Set a propper title
+plotprog=plotter(root)#Create the class that will manage all the functions
+
+if len(sys.argv)==3:  #This allows to save a figure of wich we already have a logfile directly from terminal
+    # The prgram window will still open, but it will close but itself, this will be solved, in the future, but there are
+    #things more important thatn rewriting the functions to work without the Tkinter
+    plotprog.load_logfile(sys.argv[1])#Input logfile (sys.argv[1])
+    plotprog.fig.savefig(sys.argv[2])#Output savefile  (sys.argv[2])
 else:
-    root.mainloop()#Si no ejecutamos el programa de forma normal
+    root.mainloop()#This will enable the interactive mode
