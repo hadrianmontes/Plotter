@@ -179,58 +179,70 @@ class plotter(Frame):
         self.label.set("")#Reset the values of the labels 
         self.x_label.set(self.xlabel_index[self.current_row.get()-1][self.current_column.get()-1])#This set the correct x label
         self.y_label.set(self.ylabel_index[self.current_row.get()-1][self.current_column.get()-1])#This set the correct ylabel
-    def save_plot(self,*args):
-        self.fig.savefig(tkFileDialog.asksaveasfilename(filetypes=(('Portable Document Format','*.pdf' ),
-                                                                   ('Portable Network Graphics','*.png'),
+    def save_plot(self,*args):#This function save the figure into a file
+        self.fig.savefig(tkFileDialog.asksaveasfilename(filetypes=(('Portable Document Format','*.pdf' ),#Theese are the preset file types
+                                                                   ('Portable Network Graphics','*.png'),#Its possible to insert more
                                                                                        ('All files','*.*'))))
 
-    def update_labels(self,*args):
-        self.current_axe.set_xlabel(self.x_label.get())
-        self.current_axe.set_ylabel(self.y_label.get())
-        self.xlabel_index[self.current_row.get()-1][self.current_column.get()-1]=self.x_label.get()
-        self.ylabel_index[self.current_row.get()-1][self.current_column.get()-1]=self.y_label.get()
-        self.fig.tight_layout()
-        self.canvas.draw()
-    def reset_subplot(self,*args):
-        self.current_axe.clear()
-        self.canvas.draw()
-    def set_custom_marker(self,*args):
-        self.marker.set(self.marker_custom.get())
-    def open_file(self,*args):
-        self.filename.set(tkFileDialog.askopenfilename())
-        self.label.set("")
-    def make_plot(self,*args):
-        self.file_index[self.current_row.get()-1][self.current_column.get()-1].append(self.filename.get())
-        self.label_index[self.current_row.get()-1][self.current_column.get()-1].append(self.label.get())
-        self.marker_index[self.current_row.get()-1][self.current_column.get()-1].append(self.marker.get())
+    def update_labels(self,*args):#This will change the x and y labels of a subplot to a new value
+        self.current_axe.set_xlabel(self.x_label.get())#This set the value ox the x label to the one inserted in the entry for that purpouse
+        self.current_axe.set_ylabel(self.y_label.get())#This do the same for the y axe
+        self.xlabel_index[self.current_row.get()-1][self.current_column.get()-1]=self.x_label.get()#This two senteces save the new values
+        self.ylabel_index[self.current_row.get()-1][self.current_column.get()-1]=self.y_label.get()#of the labels for making the logfile
+        self.fig.tight_layout()#We let matplotlib to arrage the spaces between subplots
+        self.canvas.draw()#Update the canvas
+    def reset_subplot(self,*args):#This will reset the current subplot
+        self.current_axe.clear()#This erase all the information of the subplot
+        self.linestyle_index[self.current_row.get()-1][self.current_column.get()-1]=[]#Empty the values of the log variables 
+        self.marker_index[self.current_row.get()-1][self.current_column.get()-1]=[]
+        self.label_index[self.current_row.get()-1][self.current_column.get()-1]=[]
+        self.file_index[self.current_row.get()-1][self.current_column.get()-1]=[]
+        self.canvas.draw()#Update the changes on the canvas
+    def set_custom_marker(self,*args):#This function allows as to refine a custom marker
+        self.marker.set(self.marker_custom.get())#This will update the value of the marker variable to the one we have entered
+    def open_file(self,*args):#This will open a window for choosing the file where to read the data
+        self.filename.set(tkFileDialog.askopenfilename())#This stores in the variable of the data file the path to the file
+        self.label.set("")#Set the label to a blank value
+    def make_plot(self,*args):#This will make the plot in the current selected subplot
+        self.file_index[self.current_row.get()-1][self.current_column.get()-1].append(self.filename.get())#Update the log variable
+        self.label_index[self.current_row.get()-1][self.current_column.get()-1].append(self.label.get())#With the information of the 
+        self.marker_index[self.current_row.get()-1][self.current_column.get()-1].append(self.marker.get())#new plot
         self.linestyle_index[self.current_row.get()-1][self.current_column.get()-1].append(self.linestyle.get())
-        f=open(self.filename.get())
-        x=[]
-        y=[]
-        for l in f:
-            try:
-                x.append(float(l.split()[0]))
-                y.append(float(l.split()[1]))
-            except:
-                pass
-        self.current_axe.plot(x,y,marker=self.marker.get(),linestyle=self.linestyle.get(),label=self.label.get())
-        self.current_axe.legend(loc="best")
+        f=open(self.filename.get(),'r')#Open the file in read mode
+        x=[]#This variable will store the data for the x axis
+        y=[]#This will store the data of the y axis
+        for l in f:#We goe throw the lines of the file
+            try:#We try to add a couple of values to the x and y, this fill only succed if both are numbers
+                x.append(float(l.split()[0]))#We assume the first column for the x data (this will be customizable in the future)
+                y.append(float(l.split()[1]))#The second column for the y data
+            except:#I should insert here only to except some kind of errors, this maybe will be changed in a future, I have to see
+                pass#which are the errors that I should allow (the ones of trying to convert string to float)
+        self.current_axe.plot(x,y,marker=self.marker.get(),linestyle=self.linestyle.get(),label=self.label.get())#We plot the data with the 
+        self.current_axe.legend(loc="best")#current settings, and place a legend. The legend will search for the best location
+        #The location of the legend may be customizable in the future
         self.fig.tight_layout()
         self.canvas.draw()
-    
-    def export_logfile(self,*args):
-        filename=(tkFileDialog.asksaveasfilename())
-        f=open(filename,'w+')
+        f.close()#We close the file
+    def export_logfile(self,*args):#This will export what we have done to make our graphics, so it will be easy to redo or continue our work
+        #from that point.
+        filename=(tkFileDialog.asksaveasfilename())#This will open a window to ask for a location to save the file
+        f=open(filename,'w+')#We open the file
+
+        #The first line of the log will be the size of the subplots (how many rows and column)
         f.write("Total Rows "+str(self.total_rows.get())+" Total Columns "+str(self.total_columns.get())+"\n")
+        #Now the loop in the rows and the columns
         for i in range(self.total_rows.get()):
             for j in range(self.total_columns.get()):
+                #For each row and column, we write its "coordinates" (row and column)
                 f.write('row= ')
                 f.write(str(i+1))
                 f.write(' column= ')
                 f.write(str(j+1))
                 f.write('\n')
+                #We write the value of the labels of the axis
                 f.write("xlabel "+self.xlabel_index[i][j]+"\n")
                 f.write("ylabel "+self.ylabel_index[i][j]+"\n")
+                #Now we loop in the files we have plotted 
                 for k in range(len(self.file_index[i][j])):
                     f.write('file ')
                     f.write(str(k+1))
