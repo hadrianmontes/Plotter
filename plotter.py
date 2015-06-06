@@ -82,31 +82,42 @@ class plotter(Frame):
         self.label=StringVar()#Variable storing the label 
         ttk.Label(mainframe,text="Label").grid(column=0,row=4)
         ttk.Entry(mainframe,textvar=self.label,width=30).grid(column=1,row=4,columnspan=3,sticky=E)#Entry to enter the label
+        
+        #Select The column where the data is stored in the file
+        self.column_x=IntVar()#This variable stores the column where the x data is in the file (0 is the first one)
+        self.column_x.set(0)#Give the variable an initial value
+        self.column_y=IntVar()#This variable stores the column where the y data is in the file (0 is the first one)
+        self.column_y.set(1)#Give the variable an initial value
+        ttk.Label(text="Column for x data").grid(column=0,row=5) 
+        ttk.Entry(textvar=self.column_x,width=3).grid(column=1,row=5)
+        ttk.Label(text="Column for y data").grid(column=2,row=5)
+        ttk.Entry(textvar=self.column_y,width=3).grid(column=3,row=5)
+
         #Combobox for selecting the maker
         self.marker=StringVar()#Variable storing the marker configuration
         self.marker.set("None")#The preset value for the marker (no marker on the points)
-        ttk.Label(mainframe,text="Marker").grid(column=0,row=5)
+        ttk.Label(mainframe,text="Marker").grid(column=0,row=6)
         combo_marker=ttk.Combobox(mainframe,textvariable=self.marker,state="readonly",width=5)
         combo_marker["values"]=["None",".",",","o","+","*",'x',"custom"]#Since there quite a lot of markers i only preload the 
-        combo_marker.grid(column=1,row=5)#esentials, but with the option custom it's posible to use wichever matplotlib supports
+        combo_marker.grid(column=1,row=6)#esentials, but with the option custom it's posible to use wichever matplotlib supports
         self.marker_custom=StringVar()#Variable storing the marker type
-        ttk.Entry(mainframe,textvar=self.marker_custom,width=5).grid(column=2,row=5,sticky=E)#Entry for the option of the custom 
-        ttk.Button(mainframe,text="Custom Marker",command=self.set_custom_marker).grid(column=4,row=5)#Button to aply the custom config
+        ttk.Entry(mainframe,textvar=self.marker_custom,width=5).grid(column=2,row=6,sticky=E)#Entry for the option of the custom 
+        ttk.Button(mainframe,text="Custom Marker",command=self.set_custom_marker).grid(column=4,row=6)#Button to aply the custom config
         #Combobox for the line Style
         self.linestyle=StringVar()#Variable storing the linestyle configuration
         self.linestyle.set("-")#Preset value for the linestyle (solid line)
-        ttk.Label(mainframe,text="Line Style").grid(column=0,row=6)
+        ttk.Label(mainframe,text="Line Style").grid(column=0,row=7)
         combo_linestyle=ttk.Combobox(mainframe,textvariable=self.linestyle,state="readonly",width=5)
         combo_linestyle["values"]=["None","-","--","-.",":"]#Those are all the posible options for the linestyle
-        combo_linestyle.grid(column=1,row=6)
+        combo_linestyle.grid(column=1,row=7)
         
         #Change the axis labels
-        ttk.Label(mainframe,text="X axis Label").grid(column=0,row=7,columnspan=2)
-        ttk.Label(mainframe,text="Y axis Label").grid(column=2,row=7,columnspan=2)
+        ttk.Label(mainframe,text="X axis Label").grid(column=0,row=8,columnspan=2)
+        ttk.Label(mainframe,text="Y axis Label").grid(column=2,row=8,columnspan=2)
         self.x_label=StringVar()#Variable storing the label for the x axis
         self.y_label=StringVar()#Variable storing the label for the y axis
-        ttk.Entry(mainframe,textvar=self.x_label).grid(column=0,row=8,columnspan=2)
-        ttk.Entry(mainframe,textvar=self.y_label).grid(column=2,row=8,columnspan=2)
+        ttk.Entry(mainframe,textvar=self.x_label).grid(column=0,row=9,columnspan=2)
+        ttk.Entry(mainframe,textvar=self.y_label).grid(column=2,row=9,columnspan=2)
         ttk.Button(mainframe,text="Update Labels",command=self.update_labels).grid(column=4,row=8)#This button aplies the labels in the axis
 
         #Make the plot
@@ -179,6 +190,8 @@ class plotter(Frame):
         self.label.set("")#Reset the values of the labels 
         self.x_label.set(self.xlabel_index[self.current_row.get()-1][self.current_column.get()-1])#This set the correct x label
         self.y_label.set(self.ylabel_index[self.current_row.get()-1][self.current_column.get()-1])#This set the correct ylabel
+        self.column_x.set(0)#Give the variable an initial value
+        self.column_y.set(1)#Give the variable an initial value
     def save_plot(self,*args):#This function save the figure into a file
         self.fig.savefig(tkFileDialog.asksaveasfilename(filetypes=(('Portable Document Format','*.pdf' ),#Theese are the preset file types
                                                                    ('Portable Network Graphics','*.png'),#Its possible to insert more
@@ -213,8 +226,8 @@ class plotter(Frame):
         y=[]#This will store the data of the y axis
         for l in f:#We goe throw the lines of the file
             try:#We try to add a couple of values to the x and y, this fill only succed if both are numbers
-                x.append(float(l.split()[0]))#We assume the first column for the x data (this will be customizable in the future)
-                y.append(float(l.split()[1]))#The second column for the y data
+                x.append(float(l.split()[self.column_x.get()]))#We read the data from the column we have previously selected
+                y.append(float(l.split()[self.column_y.get()]))#For both x and y axes
             except:#I should insert here only to except some kind of errors, this maybe will be changed in a future, I have to see
                 pass#which are the errors that I should allow (the ones of trying to convert string to float)
         self.current_axe.plot(x,y,marker=self.marker.get(),linestyle=self.linestyle.get(),label=self.label.get())#We plot the data with the 
