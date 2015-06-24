@@ -119,18 +119,32 @@ class plotter(Frame):
         ttk.Entry(mainframe,textvar=self.x_label).grid(column=0,row=9,columnspan=2)
         ttk.Entry(mainframe,textvar=self.y_label).grid(column=2,row=9,columnspan=2)
         ttk.Button(mainframe,text="Update Labels",command=self.update_labels).grid(column=4,row=8)#This button aplies the labels in the axis
+	#Limits for the x and y axes
+        #Label with information
+        ttk.Label(text="Minimun Value of the axis").grid(column=0,row=10,columnspan=2)
+        ttk.Label(text="Minimun Value of the axis").grid(column=2,row=10,columnspan=2)
+	self.xmin=DoubleVar()#Variable with the value of the minimun x
+	self.xmax=DoubleVar()#Variable with the value of the maximun x
+	self.ymin=DoubleVar()#Variable with the value of the minimun y
+	self.ymax=DoubleVar()#Variable with the value of the maximun y
+	ttk.Entry(mainframe,textvar=self.xmin).grid(column=0,row=11,columnspan=2)#Entry for the minimal value
+	ttk.Entry(mainframe,textvar=self.xmax).grid(column=2,row=11,columnspan=2)#Entry for the maximun value
+	ttk.Button(mainframe,text="x axis",command=self.change_x_axe).grid(column=4,row=11)#Update x axe
+	ttk.Entry(mainframe,textvar=self.ymin).grid(column=0,row=12,columnspan=2)#The same for the y axis
+	ttk.Entry(mainframe,textvar=self.ymax).grid(column=2,row=12,columnspan=2)
+	ttk.Button(mainframe,text="y axis",command=self.change_y_axe).grid(column=4,row=12)
 
         #Make the plot
-        ttk.Button(mainframe,text="Plot",command=self.make_plot).grid(column=0,row=11)
+        ttk.Button(mainframe,text="Plot",command=self.make_plot).grid(column=0,row=13)
         #Save the figure
-        ttk.Button(mainframe,text="Save",command=self.save_plot).grid(column=1,row=11)
+        ttk.Button(mainframe,text="Save",command=self.save_plot).grid(column=1,row=13)
         #Options of subplots
         #Reset one of the subplots
         ttk.Button(mainframe,text="Reset Subplot",command=self.reset_subplot).grid(column=4,row=1)
         # Export a configuration file of the plots, this will allow to redo the figure
-        ttk.Button(mainframe,text="Export",command=self.export_logfile).grid(column=2,row=11)
+        ttk.Button(mainframe,text="Export",command=self.export_logfile).grid(column=2,row=13)
         # Import a configuration file of the plots, this will allow to redo a previous exported figure using the logfile
-        ttk.Button(mainframe,text="import",command=self.read_logfile).grid(column=3,row=11)
+        ttk.Button(mainframe,text="import",command=self.read_logfile).grid(column=3,row=13)
     def init_program(self,*args):
         #This functions set all the presets for the program to work
         self.create_subplots()#First we create the subplots required by self.total_rows/columns
@@ -283,7 +297,7 @@ class plotter(Frame):
             if l.startswith("Total Row"):#This should be the first config line of the logfile
                 total_rows=int(l.split()[2])#Read the total number of rows
                 total_columns=int(l.split()[5])#And columns
-                if not (total_rows<=self.total_rows.get() & total_columns<=self.total_columns.get() & self.figure_created):
+                if not (total_rows>=self.total_rows.get() & total_columns>=self.total_columns.get() & self.figure_created):
                 #This will be executed if the subplots were not created or if the subplots created are not big enought.
                 #If the created subplots can fit the newones they will add to the current ones 
                     self.total_rows.set(total_rows)#We set the total number of rows and columns
@@ -340,6 +354,15 @@ class plotter(Frame):
                 self.filename.set(filename2)#Update the variable with the path to the data file
                 self.make_plot()#We make the plot
         f.close()#Finally we close the file
+    #This functions will allow to choose the range of the x and y axe
+    def change_x_axe(self,*args):
+	self.current_axe.set_xlim([self.xmin.get(),self.xmax.get()])#This line set the axes to the value entered
+        self.fig.tight_layout()#This fit all the changes
+        self.canvas.draw()#This draws the new figure
+    def change_y_axe(self,*args):
+	self.current_axe.set_ylim([self.ymin.get(),self.ymax.get()])
+        self.fig.tight_layout()
+        self.canvas.draw()
 
 #This is the beginnig of the main program
 root=Tk()#We create the root window, where everything will run
