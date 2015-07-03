@@ -213,7 +213,7 @@ class plotter(Frame):
         self.canvas.show()
         self.canvas.get_tk_widget().grid(column=5,row=0,rowspan=12)
         self.axes=[[]]#This variable will store the axes of each subplots. Th axe os a subplot is what allow to make the plot in that subplot
-        self.fig.subplots_adjust(hspace=0.001)
+
         self.file_index=[[]]#This will save wich data files were plotted in each subplot, its necessary in order to write the logfile
         self.label_index=[[]]#This variable store the labels for making the logfile
         self.marker_index=[[]]#This one store the marker for each data set
@@ -240,22 +240,25 @@ class plotter(Frame):
                 self.xlabel_index.append([])
                 self.ylabel_index.append([])
                 for j in range(self.total_columns.get()):#The next steps are the same than in the previous loop
-                    self.axes[i].append(self.fig.add_subplot(self.total_rows.get(),self.total_columns.get(),1+j+self.total_columns.get()*i,sharex=self.axes[0][j]))
+                    self.axes[i].append(self.fig.add_subplot(self.total_rows.get(),self.total_columns.get(),1+j+self.total_columns.get()*i))
                     self.file_index[i].append([])
                     self.label_index[i].append([])
                     self.marker_index[i].append([])
                     self.linestyle_index[i].append([])
                     self.xlabel_index[i].append("")
                     self.ylabel_index[i].append("")
-        #self.fig.tight_layout()#We let maplotlib to optimize the space around the subplots
+        self.fig.tight_layout()#We let maplotlib to optimize the space around the subplots
         for i in range(self.total_rows.get()-1):
             for j in range(self.total_columns.get()):
-                self.axes[i][j].xaxis.set_visible(False)
+                #self.axes[i][j].xaxis.set_visible(False)
+		self.axes[i][j].set_xticklabels('')
+		self.axes[i+1][j].get_shared_x_axes().join(self.axes[0][j],self.axes[i+1][j])
         for i in range(1,self.total_rows.get()):
             for j in range(self.total_columns.get()):
                 label=(self.axes[i][j].xaxis.get_majorticklocs())
                 label=label[0:-1]
                 self.axes[i][j].set_yticklabels(label)
+        self.fig.subplots_adjust(hspace=0.001)
         self.canvas.draw()#We dray the changes, now the main figure is divided in the subplots
         self.box_current_column["values"]=range(1,self.total_columns.get()+1)#Update the possible values in the combobox
         self.box_current_row["values"]=range(1,self.total_rows.get()+1)#of the columns and rows to make the change posiible
