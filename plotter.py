@@ -24,12 +24,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-from Tkinter import *
+from Tkinter import IntVar,StringVar,E,DoubleVar,Tk,Frame
 import ttk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg,NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
 from matplotlib.pyplot import subplots_adjust
-import tkMessageBox,tkFileDialog
+import tkFileDialog
 import sys
 
 # This Class is the one which manages the main waindow
