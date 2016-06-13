@@ -24,12 +24,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-from Tkinter import *
+from Tkinter import IntVar,StringVar,E,DoubleVar,Tk,Frame
 import ttk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg,NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
 from matplotlib.pyplot import subplots_adjust
-import tkMessageBox,tkFileDialog
+import tkFileDialog
 import sys
 
 # This Class is the one which manages the main waindow
@@ -565,7 +565,7 @@ class plotter(Frame):
             if l.startswith("Total Row"):  # This should be the first config line of the logfile
                 total_rows=int(l.split()[2])  # Read the total number of rows
                 total_columns=int(l.split()[5])  # And columns
-                if (total_rows>=self.total_rows.get() or total_columns>=self.total_columns.get() or (not self.figure_created)):
+                if (total_rows>self.total_rows.get() or total_columns>self.total_columns.get() or (not self.figure_created)):
                     # This will be executed if the subplots were not created or if the subplots created are not big enought.
                     # If the created subplots can fit the newones they will add to the current ones
                     self.total_rows.set(total_rows)  # We set the total number of rows and columns
