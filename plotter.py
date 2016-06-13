@@ -565,7 +565,7 @@ class plotter(Frame):
             if l.startswith("Total Row"):  # This should be the first config line of the logfile
                 total_rows=int(l.split()[2])  # Read the total number of rows
                 total_columns=int(l.split()[5])  # And columns
-                if (total_rows>=self.total_rows.get() or total_columns>=self.total_columns.get() or (not self.figure_created)):
+                if (total_rows>self.total_rows.get() or total_columns>self.total_columns.get() or (not self.figure_created)):
                     # This will be executed if the subplots were not created or if the subplots created are not big enought.
                     # If the created subplots can fit the newones they will add to the current ones
                     self.total_rows.set(total_rows)  # We set the total number of rows and columns
