@@ -25,7 +25,7 @@ class create_script:
         for i in range(n_rows):
             for j in range(n_columns):
                 self.h.write("axes_"+str(i+1)+"_"+str(j+1)+"=fig.add_subplot("+str(n_rows)
-                             +","+str(n_columns)+","+str(i+j*(n_columns)+1)+")\n")
+                             +","+str(n_columns)+","+str(j+i*(n_columns)+1)+")\n")
 
     def write_parameters_axes(self):
         current_row=None
