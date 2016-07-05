@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import matplotlib
 matplotlib.use("Qt4Agg")
 import matplotlib.pyplot as plt
@@ -44,7 +45,7 @@ def stick_axes(fig, stick_x=True, stick_y=True):
                 for j in range(ncols):
                     axes[i][j].set_xticklabels([])
             # Se eliminan las etiquetas que solapan
-            nbins = len(axes[-1][0].get_xticklabels())
+            nbins = len(axes[-1][-1].get_xticklabels())
             for i in range(nrows-1):
                 for j in range(ncols):
                     axes[i+1][j].yaxis.set_major_locator(MaxNLocator(nbins=nbins, prune='upper'))
@@ -83,7 +84,7 @@ $plot_data
 fig.tight_layout()
 
 # If wanted to stick the axis uncomment one of the following lines
-# REmenber that if the y axis are sticked, the y labels of some of the axis
+# Remenber that if the y axis are sticked, the y labels of some of the axis
 # will be removed, if it were necessary for any reason it is possible to rewrite
 # them after theese lines
 
