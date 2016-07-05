@@ -99,8 +99,9 @@ class create_script:
                 linestyle=""
                 color=""
                 label=""
-                current_file=l.split()[1]
             elif l.startswith('file'):
+                if current_file:
+                    self.write_plot_line(current_row,current_column,current_file,marker,linestyle,color,label)
                 current_file=l.split()[1]
             elif l.startswith("Color") and len(l.split())==2:
                 color=l.split()[1]
@@ -127,4 +128,4 @@ class create_script:
         self.h.write("')\n")
         return
 if __name__=="__main__":
-    a=create_script(open("test.save"),"test_out.py")
+    a=create_script(open("rdf.save"),"test_out.py")
